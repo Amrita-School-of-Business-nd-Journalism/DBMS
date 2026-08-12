@@ -4,7 +4,7 @@ import mysql.connector
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password=""         # <-- add your password 
+    password=""
 )
 
 cursor = db.cursor()
@@ -17,7 +17,7 @@ db.close()
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "",           # <-- add your password
+    password = "",
     database = "DBMS"
 )
 
@@ -37,7 +37,7 @@ cursor.execute("""
 
         CHECK(PHONE_NO REGEXP '^[0-9]{10}$'),
 
-        CHECL(EMAIL REGEXP '^[A-Za-z0-9_]+@[A-Za-z]+\\.[A-Za-z]{2,}$')
+        CHECK(EMAIL REGEXP '^[A-Za-z0-9_]+@[A-Za-z]+\\.[A-Za-z]{2,}$')
     );
 """)
 
@@ -67,7 +67,7 @@ cursor.execute("""
         CYCLES INT NOT NULL,
         STATUS ENUM('GOOD' , 'BAD') NOT NULL DEFAULT "GOOD",
 
-        FOREIGN KEY(DRONE_ID) REFERENCES DRONES(DRONE_ID),
+        FOREIGN KEY(DRONE_ID) REFERENCES DRONES(DRONE_ID)
 
     );
 """)
@@ -93,7 +93,7 @@ cursor.execute("""
         START_TIME DATETIME NOT NULL,
         END_TIME DATETIME NOT NULL,
 
-        PRIMARY KEY(DATTERY_ID, START_TIME)
+        PRIMARY KEY(BATTERY_ID, START_TIME),
 
         FOREIGN KEY(BATTERY_ID) REFERENCES BATTERIES(BATTERY_ID)
     );
@@ -119,13 +119,10 @@ cursor.execute("""
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS ROUTES(
         ROUTE_ID INT NOT NULL,
-        MISSION_ID INT NOT NULL,
         SOURCE VARCHAR(25) NOT NULL,
         DESTINATION VARCHAR(25) NOT NULL,
         DISTANCE DECIMAL(10,2) NOT NULL,
-        ESTIMATED_TIME INT NOT NULL,
-
-        FOREIGN KEY(MISSION_ID) REFERENCES MISSIONS(MISSION_ID)
+        ESTIMATED_TIME INT NOT NULL
     );
 """);
 
@@ -142,11 +139,19 @@ cursor.execute("""
         END_TIME DATETIME NOT NULL,
 
         FOREIGN KEY(DRONE_ID) REFERENCES DRONES(DRONE_ID),
-        FOREIGN KEY(PACKAGE_ID) REFERENCES PACKAGES(PACKAGE_ID),
-        FOREIGN KEY(ROUTE_ID) REFERENCES ROUTES(ROUTE_ID)
+        FOREIGN KEY(PACKAGE_ID) REFERENCES PACKAGES(PACKAGE_ID)
+        
 
     );
 """);
+
+
+# cursor.execute("""
+#     ALTER TABLE ROUTES
+#     ADD CONSTRAINT MISSION_ID INT NOT NULL
+#     FOREIGN KEY(MISSION_ID) REFERENCES MISSIONS(MISSION_ID);
+# """)
+
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS PAYMENTS(
@@ -171,7 +176,7 @@ cursor.execute("SHOW TABLES;")
 
 print("Tables in DBMS:")
 
-for i in cursor.fetahall():
+for i in cursor.fetchall():
     print(i[0])
 
 cursor.close()
