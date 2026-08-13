@@ -3,22 +3,22 @@ import mysql.connector
 
 db = mysql.connector.connect(
     host="localhost",
-    user="root",
-    password=""
+    user="bhuvan1707", # Beware
+    password="180589" # Beware
 )
 
 cursor = db.cursor()
 
-cursor.execute("CREATE DATABASE IF NOT EXISTS DBMS")
+cursor.execute("CREATE DATABASE IF NOT EXISTS DRONEDELIVERY")
 
 cursor.close()
 db.close()
 
 db = mysql.connector.connect(
     host = "localhost",
-    user = "root",
-    password = "",
-    database = "DBMS"
+    user="bhuvan1707", # Beware
+    password="180589", # Beware
+    database = "DRONEDELIVERY"
 )
 
 cursor = db.cursor()

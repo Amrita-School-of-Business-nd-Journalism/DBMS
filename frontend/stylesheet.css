@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    padding: 20px;
+}
+
+.container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    color: #1e3c72;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.welcome {
+    color: #666666;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 28px;
+    display: block;
+}
+
+.containerlabel {
+    color: #333333;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+input[type="email"], 
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+input[type="email"]:focus, 
+input[type="password"]:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.15);
+}
+
+.usertypes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.usertypes label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #f4f6f9;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555555;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.typesofuser label:hover {
+    background: #e9ecef;
+}
+
+.typesofuser input[type="radio"] {
+    accent-color: #1e3c72;
+    cursor: pointer;
+    transform: scale(1);
+}
+
+.login-btn {
+    background: #1e3c72;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background 0.2s ease;
+}
+
+.login-btn:hover {
+    background: #2a5298;
+}
+
+.create_acc_link {
+    display: block;
+    text-align: right;
+    margin-top: 20px;
+    font-size: 14px;
+    font-family: Arial, sans-serif; /* Change to match your design */
+}
+
+/* Anchor tag styling */
+.create_acc_link a {
+    color: #007BFF; /* Modern blue link color */
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+/* Hover effect */
+.create_acc_link a:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: underline;
+}

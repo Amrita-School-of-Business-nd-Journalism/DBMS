@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="script.js" defer></script>
+    <title>Login Portal</title>
+</head>
+<body>
+    <div class="container">
+        <form id="loginform">
+            <h3 class="title">Drone Delivery Management System</h3>
+            <label class="welcome">Welcome Back!</label>
+            <label class="containerlabel">Login as...</label>
+            <div class="usertypes">
+                <label for="customerinput">Customer</label>
+                <!-- <label for="pilotinput">Pilot</label> -->
+                <label for="vendorinput">Vendor</label>
+                <input type="radio" name="typeofuser" id="customerinput" value="customer">
+                <!-- <input type="radio" name="typeofuser" id="pilotinput" value="pilot"> -->
+                <input type="radio" name="typeofuser" id="vendorinput" value="vendor">
+            </div>
+            <label class="containerlabel">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="off">
+            <label class="containerlabel">Password</label>
+            <input type="password" id="emailpassword" name="emailpassword" required>
+            <button type="submit" id="login-btn" class="login-btn">Login</button>
+            <label id="response_login" class="create_acc_link"></label>
+        </form>
+        <label class="create_acc_link"><a href="https://google.com">Don't have an account?? Click here!</a></label>
+    </div>
+</body>
+</html>
