@@ -3,7 +3,7 @@ import mysql.connector
 
 db = mysql.connector.connect(
     host="localhost",
-    user="bhuvan1707", # Beware
+    user="admin", # Beware
     password="180589" # Beware
 )
 
@@ -16,7 +16,7 @@ db.close()
 
 db = mysql.connector.connect(
     host = "localhost",
-    user="bhuvan1707", # Beware
+    user="admin", # Beware
     password="180589", # Beware
     database = "DRONEDELIVERY"
 )
