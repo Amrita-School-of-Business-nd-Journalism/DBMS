@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" defer></link>
+    <script src="{{ url_for('static', filename='js/register.js') }}" defer></script>
+    <title>Create an Account</title>
+</head>
+<body>
+    <div class="container">
+        <form id="register-form">
+            <h3 class="title">Create an account</h3>
+            <label class="containerlabel">First Name</label>
+            <input type="text" name="first_name" required>
+            <label class="containerlabel">Last Name</label>
+            <input type="text" name="last_name" required>
+            <label class="containerlabel">Email</label>
+            <input type="email" name="email" required>
+            <label class="containerlabel">Phone Number</label>
+            <input type="text" name="phone_no" maxlength="10" required>
+            <label class="containerlabel">Password</label>
+            <input type="password" name="password" required>
+            <label class="containerlabel">Register as</label>
+            <div class="usertypes">
+                <label><input type="radio" name="role" value="CUSTOMER" required>Customer</label>
+                <label><input type="radio" name="role" value="VENDOR">Vendor</label>
+            </div>
+            <button type="submit" id="register-btn" class="login-btn">Register</button>
+        </form>
+        <p class="create_acc_link">
+            Already have an account?
+            <a href="/">
+                Login
+            </a>
+        </p>
+        <p class="create_acc_link" id="responder">
+        </p>
+        
+    </div>
+</body>
+</html>

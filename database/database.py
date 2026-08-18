@@ -26,17 +26,16 @@ cursor = db.cursor()
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS USERS(
-        USER_ID INT PRIMARY KEY,
+        USER_ID INT PRIMARY KEY AUTO_INCREMENT,
         FIRST_NAME VARCHAR(25) NOT NULL,
         LAST_NAME VARCHAR(25) NOT NULL,
         EMAIL VARCHAR(50) UNIQUE NOT NULL,
         PHONE_NO VARCHAR(10) UNIQUE NOT NULL,
-        PASSWORD_HASH VARCHAR(128) NOT NULL,
+        PASSWORD_HASH VARCHAR(255) NOT NULL,
         CREATED_AT DATE NOT NULL,
         ROLE ENUM("VENDOR", "CUSTOMER") NOT NULL,
 
         CHECK(PHONE_NO REGEXP '^[0-9]{10}$'),
-
         CHECK(EMAIL REGEXP '^[A-Za-z0-9_]+@[A-Za-z]+\\.[A-Za-z]{2,}$')
     );
 """)
@@ -47,7 +46,7 @@ cursor.execute("""
         VENDOR_NAME VARCHAR(50) NOT NULL,
         VENDOR_ADDRESS VARCHAR(100) NOT NULL
     );
-""");
+""")
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS DRONES(

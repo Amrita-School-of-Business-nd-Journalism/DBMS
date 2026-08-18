@@ -49,8 +49,9 @@ body {
     margin-top: 16px;
 }
 
-input[type="email"], 
-input[type="password"] {
+input[type="text"],
+input[type="email"],
+input[type="password"]  {
     width: 100%;
     padding: 12px;
     border: 1px solid #cccccc;
@@ -60,7 +61,8 @@ input[type="password"] {
     outline: none;
 }
 
-input[type="email"]:focus, 
+input[type="text"]:focus,
+input[type="email"]:focus,
 input[type="password"]:focus {
     border-color: #1e3c72;
     box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.15);
