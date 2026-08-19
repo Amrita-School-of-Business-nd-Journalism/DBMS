@@ -63,3 +63,40 @@ profileForm.addEventListener("submit",async (event)=>{
         alert("Could not update profile!");
     }
 });
+
+const deleteAccButton = document.getElementById("delete-account-btn");
+deleteAccButton.addEventListener("click",async() => {
+    const confirmed = confirm(
+        "Are you sure to Delete this Account?\n\n"+
+        "This Action cannot be Undone!"
+    );
+    if (!confirmed){
+        return;
+    }
+
+    deleteAccButton.innerText = "Deleting";
+    deleteAccButton.disabled = true;
+
+    try {
+        const response = await fetch("/profile",{
+            method:"DELETE"
+        });
+        const data = await response.json();
+
+        if(data.success){
+            alert(data.message);
+            window.location.href = "/";
+        }
+        else{
+            alert(data.message);
+            deleteAccButton.innerText = "Delete Account";
+            deleteAccButton.disabled = false;
+        }
+    }
+    catch(error){
+        console.error(error);
+        alert("Could not delete the Account");
+        deleteAccButton.innerText = "Delete Account";
+        deleteAccButton.disabled = false;
+    }
+})

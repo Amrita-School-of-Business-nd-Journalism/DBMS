@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import connect_w_db # From a python file in dir ../database
+from mysql.connector import IntegrityError
 # from flask_cors import CORS - Removed after joining webpages in the routing
 
 app = Flask(__name__)
@@ -43,9 +44,9 @@ def logout():
 def register_page():
     return render_template("register.html")
 
-# Register Flask Backend + SQLite - CREATE (INSERT)
+# Register Flask Backend + MariaDB - CREATE (INSERT)
 @app.route("/register", methods=["POST"])
-def register():
+def register_user():
     data = request.get_json()
     
     first_name = data["first_name"]
@@ -66,18 +67,33 @@ def register():
         VALUES(%s,%s,%s,%s,%s,CURDATE(),%s)
     """
 
-    cursor.execute(
-    query,(first_name,last_name,email,phone_no,
-    password_hash,role)
-    )
+    try:
+        cursor.execute(query, (
+            first_name,
+            last_name,
+            email,
+            phone_no,
+            password_hash,
+            role
+        ))
 
-    db.commit()
-    cursor.close()
-    db.close()
+        db.commit()
 
+    except IntegrityError:
+        db.rollback()
+
+        return jsonify({
+            "success": False,
+            "message": "Email already registered"
+        }), 409
+
+    finally:
+        cursor.close()
+        db.close()
+    
     return jsonify({
         "success": True,
-        "message": "Register successful"
+        "message": "Registration successful"
     })
 
 # Users Table GET request
@@ -85,15 +101,15 @@ def register():
 def users():
     db = connect_w_db()
     cursor = db.cursor()
-    cursor.execute("select * from USERS")
+    cursor.execute("select USER_ID,FIRST_NAME,LAST_NAME,EMAIL,ROLE from USERS")
     users = cursor.fetchall()
     cursor.close()
     db.close()
     return jsonify(users)
 
-# Login Flask Backend + SQLite - READ (SELECT WHERE)
+# Login Flask Backend + MariaDB - READ (SELECT WHERE)
 @app.route("/login",methods=["POST"])
-def login():
+def login_user():
     
     data = request.get_json()
     email = data["email"]
@@ -119,7 +135,7 @@ def login():
         return jsonify({
             "success":False,
             "message":"User not found!"
-        })
+        }), 401
 
     is_password_correct = check_password_hash(user["PASSWORD_HASH"],password)
     
@@ -127,7 +143,7 @@ def login():
         return jsonify({
             "success": False,
             "message": "Invalid password"
-        })
+        }), 401
     session["USER_ID"] = user["USER_ID"]
     session["ROLE"] = user["ROLE"]
  
@@ -145,7 +161,7 @@ def login():
 
 # Profile - User Fetching Route (Displaying in customer.html)
 @app.route("/profile")
-def profile():
+def get_profile():
     
     if "USER_ID" not in session:
         return jsonify({
@@ -204,7 +220,7 @@ def update_profile():
 
     cursor.execute(query,(first_name,last_name,phone_no,session["USER_ID"]))
     db.commit()
-    
+
     cursor.close()
     db.close()
 
@@ -213,7 +229,31 @@ def update_profile():
         "message":"User Details updated Successfully"
     })
 
+# Profile - User Delete Track
+@app.route("/profile", methods=["DELETE"])
+def delete_profile():
+    if "USER_ID" not in session:
+        return jsonify({
+            "success":False,
+            "message":"Please Login First"
+        }),401
+    db = connect_w_db()
+    cursor = db.cursor()
 
+    query = """
+    DELETE FROM USERS WHERE USER_ID = %s
+    """
+    cursor.execute(query,(session["USER_ID"],))
+
+    db.commit()
+    cursor.close()
+    db.close()
+    session.clear()
+
+    return jsonify({
+        "success":True,
+        "message":"Account Deleted Successfully"
+    })
 
 # Running the App
 if __name__=="__main__":
