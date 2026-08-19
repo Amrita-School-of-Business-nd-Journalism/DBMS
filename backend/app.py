@@ -6,12 +6,12 @@ from database import connect_w_db # From a python file in dir ../database
 app = Flask(__name__)
 app.secret_key = "DBMS-DroneApp"
 
-# Home Page - Login
+# Home Page - Login Page Render
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# Welcome Customer
+# Welcome Customer - Customer Page Render with Session
 @app.route("/customer")
 def customer_dashboard():
     if "USER_ID" not in session:
@@ -20,7 +20,7 @@ def customer_dashboard():
         return "Access denied", 403
     return render_template("customer.html")
 
-# Welcome Vendor
+# Welcome Vendor - Vendor Page Render with Session
 @app.route("/vendor")
 def vendor_dashboard():
     if "USER_ID" not in session:
@@ -29,7 +29,7 @@ def vendor_dashboard():
         return "Access denied", 403
     return render_template("vendor.html")
 
-# Logging out
+# Logging out - Session Clear
 @app.route("/logout")
 def logout():
     session.clear()
@@ -38,11 +38,12 @@ def logout():
         "message": "Logged out successfully"
     })
 
-# Registering a new account
+# Registering a new account - Register Page Render with Session
 @app.route("/register")
 def register_page():
     return render_template("register.html")
 
+# Register Flask Backend + SQLite - CREATE (INSERT)
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -79,6 +80,7 @@ def register():
         "message": "Register successful"
     })
 
+# Users Table GET request
 @app.route("/users")
 def users():
     db = connect_w_db()
@@ -89,6 +91,7 @@ def users():
     db.close()
     return jsonify(users)
 
+# Login Flask Backend + SQLite - READ (SELECT WHERE)
 @app.route("/login",methods=["POST"])
 def login():
     
@@ -127,7 +130,7 @@ def login():
         })
     session["USER_ID"] = user["USER_ID"]
     session["ROLE"] = user["ROLE"]
-
+ 
     return jsonify({
         "success": True,
         "message": "Login successful",
@@ -140,5 +143,78 @@ def login():
         }
     })
 
+# Profile - User Fetching Route (Displaying in customer.html)
+@app.route("/profile")
+def profile():
+    
+    if "USER_ID" not in session:
+        return jsonify({
+            "success" : False,
+            "message" : "Please login first"
+        }), 401
+    
+    db = connect_w_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT USER_ID, FIRST_NAME, LAST_NAME,
+        EMAIL, PHONE_NO, ROLE
+        FROM USERS WHERE USER_ID = %s
+    """,(session["USER_ID"],))
+
+    user = cursor.fetchone()
+    cursor.close()
+    db.close()
+
+    if user is None:
+        return jsonify({
+            "success":False,
+            "message":"User not found"
+        }), 404
+    
+    return jsonify({
+        "success":True,
+        "user":user
+    })
+
+# Profile - User Submitting Reflecting in DB
+@app.route("/profile", methods=["PUT"])
+def update_profile():
+    if "USER_ID" not in session:
+        return jsonify({
+            "success" : False,
+            "message" : "Please login first"
+        }), 401
+    
+    data = request.get_json()
+    first_name = data["first_name"]
+    last_name = data["last_name"]
+    phone_no = data["phone_no"]
+
+    db = connect_w_db()
+    cursor = db.cursor()
+
+    query = """
+        UPDATE USERS 
+        SET FIRST_NAME = %s,
+        LAST_NAME = %s,
+        PHONE_NO = %s 
+        WHERE USER_ID = %s
+    """
+
+    cursor.execute(query,(first_name,last_name,phone_no,session["USER_ID"]))
+    db.commit()
+    
+    cursor.close()
+    db.close()
+
+    return jsonify({
+        "success":True,
+        "message":"User Details updated Successfully"
+    })
+
+
+
+# Running the App
 if __name__=="__main__":
     app.run(debug=True)
