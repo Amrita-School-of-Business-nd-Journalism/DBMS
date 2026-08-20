@@ -3,8 +3,8 @@ import mysql.connector
 
 db = mysql.connector.connect(
     host="localhost",
-    user="root", # Beware
-    password="Jashu@124" # Beware
+    user="admin", # Beware
+    password="180589" # Beware
 )
 
 cursor = db.cursor()
@@ -16,13 +16,12 @@ db.close()
 
 db = mysql.connector.connect(
     host = "localhost",
-    user="root", # Beware
-    password="Jashu@124", # Beware
+    user="admin", # Beware
+    password="180589", # Beware
     database = "DRONEDELIVERY"
 )
 
 cursor = db.cursor()
-
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS USERS(

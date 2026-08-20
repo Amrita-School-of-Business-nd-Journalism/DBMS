@@ -149,6 +149,9 @@ def login_user():
     try:
         cursor.execute(query,(email,role))
         user = cursor.fetchone()
+    except error as e:
+        print(e)
+
     finally:
         cursor.close()
         db.close()
@@ -182,10 +185,10 @@ def login_user():
         }
     })
 
-# Profile - User Fetching Route (Displaying in customer.html)
+# Customer Profile - User Fetching Route (Displaying in customer.html)
 @app.route("/profile")
 @login_required
-def get_profile():    
+def get_profile():
     db = connect_w_db()
     cursor = db.cursor(dictionary=True)
     
@@ -196,7 +199,8 @@ def get_profile():
             FROM USERS WHERE USER_ID = %s
         """,(session["USER_ID"],))
         user = cursor.fetchone()
-    
+    except error as e:
+        print(e)
     finally:
         cursor.close()
         db.close()
@@ -212,7 +216,7 @@ def get_profile():
         "user":user
     })
 
-# Profile - User Submitting Reflecting in DB
+# Customer Profile - User Submitting Reflecting in DB
 @app.route("/profile", methods=["PUT"])
 @login_required
 def update_profile():
@@ -239,6 +243,8 @@ def update_profile():
     try:
         cursor.execute(query,(first_name,last_name,phone_no,session["USER_ID"]))
         db.commit()
+    except error as e:
+        print(e)
     finally:
         cursor.close()
         db.close()
@@ -249,11 +255,10 @@ def update_profile():
         "message":"User Details updated Successfully"
     })
 
-# Profile - User Delete Track
+# Customer Profile - User Delete Track
 @app.route("/profile", methods=["DELETE"])
 @login_required
 def delete_profile():
-    
     db = connect_w_db()
     cursor = db.cursor()
 
@@ -263,6 +268,8 @@ def delete_profile():
     try:
         cursor.execute(query,(session["USER_ID"],))
         db.commit()
+    except error as e:
+        print(e)
     finally:
         cursor.close()
         db.close()
@@ -272,6 +279,48 @@ def delete_profile():
     return jsonify({
         "success":True,
         "message":"Account Deleted Successfully"
+    })
+
+# Customer Dashboard Stats - Get
+@app.route("/dashboard/stats")
+@login_required
+def get_dashboard_stats():
+    db = connect_w_db()
+    cursor = db.cursor(dictionary=True)
+    
+    # Packages Count
+    query = """
+    SELECT COUNT(*) as package_count FROM PACKAGES WHERE USER_ID = %s;
+    """
+    cursor.execute(query,(sesion["USER_ID"]))
+    package_count = cursor.fetchone()["PACKAGE_COUNT"]
+    
+    # Packages - Ongoing Count
+    query = """
+    SELECT COUNT(*) AS ONGOING_COUNT FROM 
+    (SELECT P.PACKAGE_ID FROM MISSIONS M JOIN PACKAGES P
+    USING(PACKAGE_ID) WHERE M.MISSION_STATUS = "ONGOING" 
+    AND P.USER_ID = 1) 
+    JT;
+    """
+
+    cursor.execute(query,(sesion["USER_ID"]))
+    ongoing_count = cursor.fetchone()["ONGOING_COUNT"]
+
+    # # Completed Deliveries
+    # query = """
+
+    # """
+
+    db.commit()
+    cursor.close()
+    db.close()
+    
+    return jsonify({
+        "success": True,
+        "packages": package_count,
+        "ongoing": ongoing_count,
+        "completed": completed_count
     })
 
 # Running the App

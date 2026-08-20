@@ -1,4 +1,5 @@
-const lastName = document.getElementById("customer-last-name");
+const navCustomerName = document.getElementById("nav-customer-name");
+const dashboardName = document.getElementById("dashboard-name");
 const firstNameInput = document.getElementById("first-name");
 const lastNameInput = document.getElementById("last-name");
 const emailInput = document.getElementById("email");
@@ -17,7 +18,8 @@ async function loadProfile(){
             return;
         }
         const user = data.user
-        lastName.innerText = user.FIRST_NAME + " " + user.LAST_NAME;
+        navCustomerName.innerText = user.FIRST_NAME + " " + user.LAST_NAME;
+        dashboardName.innerText = " " + user.FIRST_NAME;
         
         firstNameInput.value = user.FIRST_NAME;
         lastNameInput.value = user.LAST_NAME;
@@ -52,7 +54,8 @@ profileForm.addEventListener("submit",async (event)=>{
 
         if(result.success){
             alert(result.message);
-            lastName.innerText = data.first_name + " " + data.last_name;
+            navCustomerName.innerText = data.first_name + " " +data.last_name;
+            dashboardName.innerText = data.first_name;
         }
         else{
             alert(result.message);

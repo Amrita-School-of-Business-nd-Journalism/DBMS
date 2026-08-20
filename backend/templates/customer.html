@@ -8,14 +8,62 @@
     <script src="{{ url_for('static', filename='js/cd.js') }}" defer></script>
     <title>Welcome! Customer</title>
 </head>
-<body>
-    <header>
-        <h2>Welcome! <span id="customer-last-name">Customer</span>!!!</h2>
-        <p>Drone Delivery Management System</p>
-        <button id="logout-btn">Logout</button>
-    </header>
+<body id="top">
+    <nav class="navbar">
+        <div class="logo">
+            Drone Delivery
+        </div>
+        <div class="nav-links">
+            <a href="#top">Dashboard</a>
+            <a href="#">My Deliveries</a>
+            <a href="#profile-section">Profile</a>
+        </div>
+        <div class="nav-user">
+            <span id="nav-customer-name">Customer</span>
+            <button id="logout-btn">Logout</button> 
+        </div>
+    </nav>
     <main>
-        <section class="profile-section">
+        <!--WELCOME-->
+        <section class="welcome-section">
+            <h1>Welcome back,<span id="dashboard-name">Customer</span>!</h1>
+            <p>Here's what's happening with your deliveries.</p>
+        </section>
+        <!--STATISTICS-->
+        <section class="stats">
+            <div class="stat-card">
+                <h3>Packages</h3>
+                <p>0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Ongoing</h3>
+                <p>0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Completed</h3>
+                <p>0</p>
+            </div>
+        </section>
+        <!--RECENT-DELIVERIES-->
+        <section class="recent-deliveries">
+            <h3>Recent Deliveries</h3>
+            <p class="empty-state">
+                No deliveries yet.
+            </p>
+            </div>
+        </section>
+        <!--QUICK ACTIONS-->
+        <section class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+                <button id="new-delivery-btn"> New Delivery</button>
+                <button id="track-delivery-btn"> Track Delivery</button>
+            </div>
+        </section>
+        <!--PROFILE-->
+        <section class="profile-section" id="profile-section">
             <h3>Profile Settings</h3>
             <p class="section-description">Manage your Personal Details</p>
             <form id="profile-form">
