@@ -1,11 +1,27 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import connect_w_db # From a python file in dir ../database
 from mysql.connector import IntegrityError
+from functools import wraps
 # from flask_cors import CORS - Removed after joining webpages in the routing
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "DBMS-DroneApp"
+app.secret_key = os.environ.get("SECRET_KEY", "default-secret-key")
+
+def login_required(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if "USER_ID" not in session:
+            return jsonify({
+                "success": False,
+                "message": "Please login first"
+            }), 401
+        return function(*args, **kwargs)
+    return wrapper
 
 # Home Page - Login Page Render
 @app.route("/")
@@ -14,18 +30,16 @@ def home():
 
 # Welcome Customer - Customer Page Render with Session
 @app.route("/customer")
+@login_required
 def customer_dashboard():
-    if "USER_ID" not in session:
-        return "Please login first", 401
     if session["ROLE"] != "CUSTOMER":
         return "Access denied", 403
     return render_template("customer.html")
 
 # Welcome Vendor - Vendor Page Render with Session
 @app.route("/vendor")
+@login_required
 def vendor_dashboard():
-    if "USER_ID" not in session:
-        return "Please login first", 401
     if session["ROLE"] != "VENDOR":
         return "Access denied", 403
     return render_template("vendor.html")
@@ -49,12 +63,15 @@ def register_page():
 def register_user():
     data = request.get_json()
     
-    first_name = data["first_name"]
-    last_name = data["last_name"]
-    email = data["email"]
-    phone_no = data["phone_no"]
-    password = data["password"]
-    role = data["role"]
+    try:
+        first_name = data["first_name"]
+        last_name = data["last_name"]
+        email = data["email"]
+        phone_no = data["phone_no"]
+        password = data["password"]
+        role = data["role"]
+    except KeyError as e:
+        return jsonify({"success": False, "message": f"Missing field: {e.args[0]}"}), 400
 
     password_hash = generate_password_hash(password)
 
@@ -101,10 +118,12 @@ def register_user():
 def users():
     db = connect_w_db()
     cursor = db.cursor()
-    cursor.execute("select USER_ID,FIRST_NAME,LAST_NAME,EMAIL,ROLE from USERS")
-    users = cursor.fetchall()
-    cursor.close()
-    db.close()
+    try:
+        cursor.execute("select USER_ID,FIRST_NAME,LAST_NAME,EMAIL,ROLE from USERS")
+        users = cursor.fetchall()
+    finally:
+        cursor.close()
+        db.close()
     return jsonify(users)
 
 # Login Flask Backend + MariaDB - READ (SELECT WHERE)
@@ -112,9 +131,12 @@ def users():
 def login_user():
     
     data = request.get_json()
-    email = data["email"]
-    password = data["password"]
-    role = data["role"]
+    try:
+        email = data["email"]
+        password = data["password"]
+        role = data["role"]
+    except KeyError as e:
+        return jsonify({"success": False, "message": f"Missing field: {e.args[0]}"}), 400
     
     db = connect_w_db()
     cursor = db.cursor(dictionary=True)
@@ -124,11 +146,12 @@ def login_user():
     WHERE EMAIL=%s AND ROLE=%s
     """
 
-    cursor.execute(query,(email,role))
-    user = cursor.fetchone()
-    
-    cursor.close()
-    db.close()
+    try:
+        cursor.execute(query,(email,role))
+        user = cursor.fetchone()
+    finally:
+        cursor.close()
+        db.close()
 
 
     if user is None:
@@ -161,26 +184,22 @@ def login_user():
 
 # Profile - User Fetching Route (Displaying in customer.html)
 @app.route("/profile")
-def get_profile():
-    
-    if "USER_ID" not in session:
-        return jsonify({
-            "success" : False,
-            "message" : "Please login first"
-        }), 401
-    
+@login_required
+def get_profile():    
     db = connect_w_db()
     cursor = db.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT USER_ID, FIRST_NAME, LAST_NAME,
-        EMAIL, PHONE_NO, ROLE
-        FROM USERS WHERE USER_ID = %s
-    """,(session["USER_ID"],))
-
-    user = cursor.fetchone()
-    cursor.close()
-    db.close()
+    
+    try:
+        cursor.execute("""
+            SELECT USER_ID, FIRST_NAME, LAST_NAME,
+            EMAIL, PHONE_NO, ROLE
+            FROM USERS WHERE USER_ID = %s
+        """,(session["USER_ID"],))
+        user = cursor.fetchone()
+    
+    finally:
+        cursor.close()
+        db.close()
 
     if user is None:
         return jsonify({
@@ -195,17 +214,16 @@ def get_profile():
 
 # Profile - User Submitting Reflecting in DB
 @app.route("/profile", methods=["PUT"])
+@login_required
 def update_profile():
-    if "USER_ID" not in session:
-        return jsonify({
-            "success" : False,
-            "message" : "Please login first"
-        }), 401
-    
+
     data = request.get_json()
-    first_name = data["first_name"]
-    last_name = data["last_name"]
-    phone_no = data["phone_no"]
+    try:
+        first_name = data["first_name"]
+        last_name = data["last_name"]
+        phone_no = data["phone_no"]
+    except KeyError as e:
+        return jsonify({"success": False, "message": f"Missing field: {e.args[0]}"}), 400
 
     db = connect_w_db()
     cursor = db.cursor()
@@ -218,11 +236,13 @@ def update_profile():
         WHERE USER_ID = %s
     """
 
-    cursor.execute(query,(first_name,last_name,phone_no,session["USER_ID"]))
-    db.commit()
+    try:
+        cursor.execute(query,(first_name,last_name,phone_no,session["USER_ID"]))
+        db.commit()
+    finally:
+        cursor.close()
+        db.close()
 
-    cursor.close()
-    db.close()
 
     return jsonify({
         "success":True,
@@ -231,23 +251,22 @@ def update_profile():
 
 # Profile - User Delete Track
 @app.route("/profile", methods=["DELETE"])
+@login_required
 def delete_profile():
-    if "USER_ID" not in session:
-        return jsonify({
-            "success":False,
-            "message":"Please Login First"
-        }),401
+    
     db = connect_w_db()
     cursor = db.cursor()
 
     query = """
     DELETE FROM USERS WHERE USER_ID = %s
     """
-    cursor.execute(query,(session["USER_ID"],))
-
-    db.commit()
-    cursor.close()
-    db.close()
+    try:
+        cursor.execute(query,(session["USER_ID"],))
+        db.commit()
+    finally:
+        cursor.close()
+        db.close()
+        
     session.clear()
 
     return jsonify({

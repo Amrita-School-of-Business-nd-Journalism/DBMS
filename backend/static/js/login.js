@@ -41,8 +41,6 @@ myform.addEventListener('submit',async (event)=>{
             responsetohtml.innerText = data.message;
             responsetohtml.style.color = "red";
         }
-        loginbutton.innerText = 'Login';
-        loginbutton.disabled = false;
     }
     catch(error){
         console.error(error);
